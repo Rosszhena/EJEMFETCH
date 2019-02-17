@@ -1,0 +1,80 @@
+
+
+<!DOCTYPE html>
+<html>
+
+<head>
+<script type="text/javascript">
+
+
+
+  async function login() {
+    const options =   {
+          method: 'POST',
+          headers: {
+            'Accept': 'application/json',
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({email:'', password: ''})
+        }
+
+
+        let response = await fetch('https://mighty-refuge-81707.herokuapp.com/api/auth/user/authenticate',options);
+
+        let user = await response.json();
+        if(user.error)
+          console.log(user.error)
+        else{
+          console.log(user)
+          ////console.log(user.token)
+          var decodedString = atob(user.token.split('.')[1]);
+          //console.log(decodedString);
+          localStorage.setItem("myid", user.token.split('.')[1]);
+        }
+
+  }
+
+  login();
+
+   function consultaCatalogos() {
+
+      let catagalogos =  new Promise((resolve, reject) => {
+       const options =   {
+             method: 'GET',
+             headers: {
+               'Accept': 'application/json',
+               'Content-Type': 'application/json',
+               'Authorization': localStorage.getItem("myid"),
+             }
+           }
+
+      return fetch('https://mighty-refuge-81707.herokuapp.com/api/catalogs/cards',options).then(response => {
+        if (response.ok) {
+          resolve(response)
+        } else {
+          reject(new Error('error'))
+        }
+      }, error => {
+        reject(new Error(error.message))
+      })
+    })
+
+console.log(catagalogos);
+
+  }
+
+
+
+
+
+//
+
+</script>
+</head>
+<body>
+
+<h1>My First Heading</h1>
+<p id="login">My first paragraph.</p>
+<button type="button" name="button" onclick="consultaCatalogos()">VerCatalogos</button>
+</body>
+</html>
